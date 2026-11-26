@@ -4,6 +4,7 @@
 
     <application
         android:label="MTPEE"
+                android:icon="@drawable/mtpee_icon"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity
             android:name=".MainActivity"
