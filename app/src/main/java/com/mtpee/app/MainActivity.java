@@ -41,6 +41,17 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        webView.setOnApplyWindowInsetsListener((view, insets) -> {
+    if (android.os.Build.VERSION.SDK_INT >= 30
+            && getApplicationInfo().targetSdkVersion >= 35
+            && android.os.Build.VERSION.SDK_INT >= 35) {
+        android.graphics.Insets bars = insets.getInsets(
+                android.view.WindowInsets.Type.systemBars()
+                | android.view.WindowInsets.Type.displayCutout());
+        view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+    }
+    return insets;
+});
 
         setContentView(webView);
         webView.loadUrl("file:///android_asset/MTPEE_Anh_Nen.html");
