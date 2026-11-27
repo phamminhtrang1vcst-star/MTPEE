@@ -110,4 +110,38 @@ protected void onStop() {
     }
 
     super.onStop();
-}}
+}
+    private void loadPlaybackQueue(Uri[] files) {
+        ListenableFuture<MediaController> future = playbackControllerFuture;
+        if (future == null || files == null || files.length == 0) {
+            return;
+        }
+
+        future.addListener(() -> {
+            if (playbackControllerFuture != future) {
+                return;
+            }
+
+            try {
+                MediaController controller = future.get();
+                java.util.ArrayList<androidx.media3.common.MediaItem> tracks =
+                        new java.util.ArrayList<>();
+
+                for (Uri file : files) {
+                    if (file != null) {
+                        tracks.add(androidx.media3.common.MediaItem.fromUri(file));
+                    }
+                }
+
+                if (!tracks.isEmpty()) {
+                    controller.pause();
+                    controller.setMediaItems(tracks);
+                    controller.prepare();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (java.util.concurrent.ExecutionException e) {
+                android.util.Log.e("MTPEE", "Cannot connect to PlaybackService", e);
+            }
+        }, getMainExecutor());
+    }}
