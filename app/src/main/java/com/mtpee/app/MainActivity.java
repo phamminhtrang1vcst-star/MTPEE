@@ -32,9 +32,16 @@ public class MainActivity extends Activity {
                 }
                 pendingFileSelection = callback;
 
-                try {
-                    startActivityForResult(params.createIntent(), PICK_FILE);
-                } catch (ActivityNotFoundException e) {
+                try { Intent picker = params.createIntent();
+
+if (params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE) {
+    picker = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    picker.addCategory(Intent.CATEGORY_OPENABLE);
+    picker.setType("audio/*");
+    picker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+}
+
+startActivityForResult(picker, PICK_FILE);} catch (ActivityNotFoundException e) {
                     pendingFileSelection = null;
                     callback.onReceiveValue(null);
                 }
@@ -64,8 +71,19 @@ public class MainActivity extends Activity {
         if (requestCode == PICK_FILE && pendingFileSelection != null) {
             ValueCallback<Uri[]> callback = pendingFileSelection;
             pendingFileSelection = null;
-            callback.onReceiveValue(
-                    WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+            if (resultCode == RESULT_OK && data != null && data.getClipData() != null) {
+    android.content.ClipData selection = data.getClipData();
+    Uri[] files = new Uri[selection.getItemCount()];
+
+    for (int i = 0; i < files.length; i++) {
+        files[i] = selection.getItemAt(i).getUri();
+    }
+
+    callback.onReceiveValue(files);
+} else {
+    callback.onReceiveValue(
+            WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                               }
         }
     }
 }
