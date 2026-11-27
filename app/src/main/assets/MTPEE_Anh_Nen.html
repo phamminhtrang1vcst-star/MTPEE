@@ -2,7 +2,7 @@
 <html lang="vi" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <title>MTPEE — Đồng Hồ Tập Trung & Máy Đĩa Than Hi-Fi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -318,6 +318,45 @@
             -webkit-user-select: text;
         }
     </style>
+    <style>
+        :root {
+            --mtpee-safe-top: env(safe-area-inset-top, 0px);
+            --mtpee-safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        :root[data-android-webview] {
+            --mtpee-safe-top: max(env(safe-area-inset-top, 0px), 32px);
+            --mtpee-safe-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+        }
+        #mtpee-player {
+            box-sizing: border-box;
+            padding-top: calc(var(--mtpee-safe-top) + 12px);
+            padding-bottom: calc(var(--mtpee-safe-bottom) + 80px);
+            justify-content: safe space-between;
+            gap: clamp(8px, 1.5dvh, 16px);
+            overflow-y: auto;
+        }
+        #mtpee-player #timerRingStage, #mtpee-player #vinylTurntableStage {
+            width: min(68vw, 34dvh, 260px);
+            height: auto;
+            aspect-ratio: 1;
+        }
+        #mtpee-player #lyricsStageBox { margin-block: 0; }
+        #mtpee-player header > :first-child { flex: 1; }
+        #mtpee-player #musicControlsGroup button {
+            width: clamp(36px, 11vw, 44px);
+            height: clamp(36px, 11vw, 44px);
+        }
+        #mtpee-player #musicControlsGroup .liquid-glass-cta {
+            width: clamp(44px, 13vw, 56px);
+            height: clamp(44px, 13vw, 56px);
+        }
+        #mtpee-bottom-actions { bottom: calc(var(--mtpee-safe-bottom) + 12px); }
+    </style>
+    <script>
+        if (location.protocol === 'file:' && location.pathname.startsWith('/android_asset/')) {
+            document.documentElement.dataset.androidWebview = '';
+        }
+    </script>
 </head>
 <body class="bg-black text-white flex flex-col items-center justify-between h-[100dvh] w-full overflow-hidden relative">
 
@@ -359,7 +398,7 @@
     <input type="file" id="vinylImageInput" accept="image/*" class="hidden">
 
     <!-- 2. MAIN APP SHELL (z-20) -->
-    <main class="relative z-20 w-full max-w-md h-full flex flex-col justify-between px-4 pt-4 pb-24">
+    <main id="mtpee-player" class="relative z-20 w-full max-w-md h-full flex flex-col justify-between px-4 pt-4 pb-24">
 
         <!-- TOP NAVIGATION BAR (4 ELEMENTS) -->
         <header class="w-full flex items-center justify-between gap-2 shrink-0">
@@ -817,7 +856,7 @@
     </div>
 
     <!-- 6. BOTTOM SYMMETRICAL BAR & EXPANDABLE LIQUID GLASS MULTI-GIF DOCK (z-40) -->
-    <div class="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-40 flex items-center justify-between pointer-events-none">
+    <div id="mtpee-bottom-actions" class="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-40 flex items-center justify-between pointer-events-none">
         <button id="resetBtn" type="button" aria-label="Đặt lại đồng hồ" title="Đặt lại đồng hồ"
                 class="liquid-glass-pill pointer-events-auto w-[52px] h-[52px] rounded-full text-white flex items-center justify-center shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
