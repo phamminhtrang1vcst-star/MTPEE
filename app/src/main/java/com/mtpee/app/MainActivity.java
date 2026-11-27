@@ -8,11 +8,17 @@ import android.os.Bundle;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.content.ComponentName;
+
+import androidx.media3.session.MediaController;
+import androidx.media3.session.SessionToken;
+
+import com.google.common.util.concurrent.ListenableFuture;
 
 public class MainActivity extends Activity {
     private static final int PICK_FILE = 100;
     private ValueCallback<Uri[]> pendingFileSelection;
-
+private ListenableFuture<MediaController> playbackControllerFuture;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,4 +92,22 @@ startActivityForResult(picker, PICK_FILE);} catch (ActivityNotFoundException e) 
                                }
         }
     }
+@Override
+protected void onStart() {
+    super.onStart();
+
+    SessionToken token = new SessionToken(
+            this, new ComponentName(this, PlaybackService.class));
+    playbackControllerFuture = new MediaController.Builder(this, token)
+            .buildAsync();
 }
+
+@Override
+protected void onStop() {
+    if (playbackControllerFuture != null) {
+        MediaController.releaseFuture(playbackControllerFuture);
+        playbackControllerFuture = null;
+    }
+
+    super.onStop();
+}}
